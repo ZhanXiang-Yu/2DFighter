@@ -3,18 +3,18 @@
 The game is set up using the game template for raylib with Premake 5.
 For more information, reference: (https://github.com/raylib-extras/game-premake)
 
-## $(Game Title)
+## Fighter Jet
 
-![$(Fighter)](screenshots/screenshot000.png "$(Fighter)")
+_TODO: add menu pic
 
 ### Description
 
-$(A retro 2D topdown space fighter jet shooter game)$
+A retro 2D topdown space fighter jet shooter game
 
 ### Features
 
- - $(Shoot Alien Spaceships)
- - $(Do not get shot by Alien Spaceships)
+ - Shoot Alien Spaceships
+ - Do not get shot by Alien Spaceships
 
 ### Controls
 
