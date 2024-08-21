@@ -1,4 +1,6 @@
-.vs
+.vscode/
 raylib-master/
 Makefile
 makefile
+*.d
+premake*
