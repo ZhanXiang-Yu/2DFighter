@@ -1,4 +1,4 @@
 .vs
 raylib-master/
-**/Makefile
-**/makefile
+Makefile
+makefile
