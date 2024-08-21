@@ -4,3 +4,4 @@ Makefile
 makefile
 *.d
 premake*
+*premake*
