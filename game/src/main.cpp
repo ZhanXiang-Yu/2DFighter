@@ -36,7 +36,7 @@ int main()
 
     //init audio
     InitAudioDevice();
-    Sound shootLaser = LoadSound("resources/laser.wav");   // Load button sound
+    Sound shootLaser = LoadSound("resources/laser1.wav");   // Load button sound
     Texture2D playButton = LoadTexture("resources/PLAY.png"); // Load button texture
 
     //set icon
@@ -110,8 +110,8 @@ int main()
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             PlaySound(shootLaser);
-            std::cout << "sound playing" << std::endl;
             //TODO: spawn bullets
+            //TODO: add delay
         }
 
         //----------------------------------------------------------------------------------
