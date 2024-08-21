@@ -16,7 +16,7 @@ make GUI for game to run
 
 /*
 bugs:
-mouse cursor show on reenter to Window
+
 */
 
 #include "raylib.h"
@@ -29,30 +29,37 @@ mouse cursor show on reenter to Window
 
 int main()
 {
-    InitWindow(1000, 1000, "Fighter");
+    //window size
+    const int screenWidth = 1000;
+    const int screenHeight = 1000;
+    InitWindow(screenWidth, screenHeight, "Fighter");
+
+    //init audio
+    InitAudioDevice();
+    Sound shootLaser = LoadSound("resources/laser.wav");   // Load button sound
+    Texture2D playButton = LoadTexture("resources/PLAY.png"); // Load button texture
+
     //set icon
     Image icon = LoadImage("resources/icon.png");
     SetWindowIcon(icon); 
 
+    //set background
+    Texture2D background = LoadTexture("resources/background.png");
+    float scrollingBack = 0.0f;
+
     SetTargetFPS(60);
 
-    //load font
-    Font playFont = LoadFontEx("resources/arcadeclassic/ARCADECLASSIC.ttf", 100, 0, 250);
-    // Set bilinear scale filter for better font scaling
-    SetTextureFilter(playFont.texture, TEXTURE_FILTER_BILINEAR);    
-    SetTextLineSpacing(20);         // Set line spacing for multiline text (when line breaks are included '\n')
-    //load font to GUI
-    GuiSetFont(playFont);
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 50);
 
-    //set control style for widgets
-    GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, 0xF8F8F8FF);
-    GuiSetStyle(BUTTON, BASE_COLOR_FOCUSED, 0x18151BFF);
-    GuiSetStyle(BUTTON, BASE_COLOR_PRESSED, 0x18151BFF);
-    GuiSetStyle(BUTTON, BORDER_COLOR_FOCUSED, 0xF8F8F8FF);
-    GuiSetStyle(BUTTON, BORDER_COLOR_PRESSED, 0xF8F8F8FF);
+    //play button states and animation frames set
+    int btnState = 0;               // Button state: 0-NORMAL, 1-MOUSE_HOVER, 2-PRESSED
+    bool btnAction = false;         // Button action should be activated
 
-    bool showMessageBox = false;
+    // Define frame rectangle for drawing
+    float frameHeight = (float)playButton.height/3;
+    Rectangle sourceRec = { 0, 0, (float)playButton.width, frameHeight };
+
+    // Define button bounds on screen
+    Rectangle btnBounds = { screenWidth/2.0f - playButton.width/2.0f, screenHeight/2.0f - playButton.height/3/2.0f, (float)playButton.width, frameHeight };
 
     //load cursor image
     Texture2D spaceship = LoadTexture("resources/spaceship.png");
@@ -60,37 +67,77 @@ int main()
     int posx = 0;
     int posy = 0;
 
+    //cursor position for shooting
+    Vector2 cockpitPos = {0.0f, 0.0f};
+
     HideCursor();
+    if(IsAudioDeviceReady())
+    {
+        std::cout << "audio device initialized" << std::endl;
+    }
     while (!WindowShouldClose())
     {
-        if(!IsCursorHidden())
+        
+        //update scrolling
+        scrollingBack += 0.9f;
+        // with respect to scaling
+        if (scrollingBack >= background.height) scrollingBack = 0;
+
+        //get cursor position and align in the middle of cursor to draw spaceship
+        posx = GetMousePosition().x - 75;
+        posy = GetMousePosition().y - 75;
+
+        //get cursor position with respect to front of spaceship for game operations
+        cockpitPos = {GetMousePosition().x - 75, GetMousePosition().y};
+        btnState = false;
+        // Check button state
+        if (CheckCollisionPointRec(cockpitPos, btnBounds))
         {
-            HideCursor();
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) btnState = 2;
+            else btnState = 1;
+
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) btnAction = true;
         }
+        else btnState = 0;
+
+        if (btnAction)
+        {
+            // TODO: scene transition to playing the game
+
+        }
+
+        //mouse pressed
+        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            PlaySound(shootLaser);
+            std::cout << "sound playing" << std::endl;
+            //TODO: spawn bullets
+        }
+
         //----------------------------------------------------------------------------------
         BeginDrawing();
             ClearBackground(GetColor(0x18151BFF));
-            //get cursor position and align in the middle of cursor
-            posx = GetMousePosition().x - 75;
-            posy = GetMousePosition().y - 75;
+
+            
+
+            //draw background
+            DrawTextureEx(background, (Vector2){0, scrollingBack}, 0.0f, 1.0f, WHITE);
+            DrawTextureEx(background, (Vector2){0, -background.height + scrollingBack}, 0.0f, 1.0f, WHITE);
+            
+            //DrawTexture(playButton, 375, 460, WHITE);
+            DrawTextureRec(playButton, sourceRec, (Vector2){ btnBounds.x, btnBounds.y }, WHITE); // Draw button frame
+
             //draw spaceship as new cursor
             DrawTexture(spaceship, posx, posy, WHITE);
-            //hide mouse
-            
-            if (GuiButton((Rectangle){ 375, 460, 250, 80 }, "PLAY!")) showMessageBox = true;
 
-            if (showMessageBox)
-            {
-                int result = GuiMessageBox((Rectangle){ 85, 70, 250, 100 },
-                    "#191#Message Box", "supposedly start playing", "Nice;Cool");
-
-                if (result >= 0) showMessageBox = false;
-            }
         EndDrawing();
     }
-    UnloadFont(playFont); 
+    //UnloadFont(playFont); 
     UnloadTexture(spaceship);
     UnloadImage(icon);
+    UnloadTexture(playButton);
+    UnloadSound(shootLaser);
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }

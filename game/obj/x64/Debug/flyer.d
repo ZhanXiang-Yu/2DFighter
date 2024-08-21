@@ -1,2 +1,2 @@
-obj/x64/Debug/flyer.o: src/flyer.cpp src/flyer.h
-src/flyer.h:
+obj/x64/Debug/flyer.o: src/flyer.cpp src/flyer.hpp
+src/flyer.hpp:
