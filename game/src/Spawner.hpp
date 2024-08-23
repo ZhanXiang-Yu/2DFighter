@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "Enemy.hpp"
+#include <iostream>
 #include <vector>
 
 class Spawner
