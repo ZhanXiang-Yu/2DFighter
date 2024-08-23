@@ -1,37 +1,19 @@
 /*
-player control fighter
-fighter shoots bullet
-enemy spawn randomly at other side of the map(top of screen)
-enemy shoots bullet
-fighter bullet touches enemy
-enemy bullet touches fighter
-health -> fighter/enemy die, UI/global system
-
-make GUI for game to run
-    user interactable window
-    play button
-    control as labels
-
-*/
-
-/*
 bugs:
-
+play button disappear to a smaller version of background -> fix scene transition issue
 */
 
 #include "raylib.h"
 #include <string>
 #include <iostream>
-
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
-
+#include "util.hpp"
+#include "Enemy.hpp"
 
 int main()
 {
     //window size
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
+    const int screenWidth = 1980;
+    const int screenHeight = 1020;
     InitWindow(screenWidth, screenHeight, "Fighter");
 
     //init audio
@@ -51,15 +33,13 @@ int main()
 
 
     //play button states and animation frames set
-    int btnState = 0;               // Button state: 0-NORMAL, 1-MOUSE_HOVER, 2-PRESSED
-    bool btnAction = false;         // Button action should be activated
+    bool btnState = false;         // Button action should be activated
 
     // Define frame rectangle for drawing
-    float frameHeight = (float)playButton.height/3;
-    Rectangle sourceRec = { 0, 0, (float)playButton.width, frameHeight };
+    //Rectangle sourceRec = { 0, 0, (float)playButton.width, float(playButton.height) };
 
     // Define button bounds on screen
-    Rectangle btnBounds = { screenWidth/2.0f - playButton.width/2.0f, screenHeight/2.0f - playButton.height/3/2.0f, (float)playButton.width, frameHeight };
+    Rectangle btnBounds = {screenWidth/2.0f - playButton.width/2.0f, screenHeight/2.0f - playButton.height/2.0f, (float)playButton.width, (float)playButton.height };
 
     //load cursor image
     Texture2D spaceship = LoadTexture("resources/spaceship.png");
@@ -69,6 +49,11 @@ int main()
 
     //cursor position for shooting
     Vector2 cockpitPos = {0.0f, 0.0f};
+
+    //params. for diff. textures
+    Vector2 backgroundPos1 = {0.0f, 0.0f};
+    Vector2 backgroundPos2 = {0, 0.0f};
+    Vector2 playButtonPos = {btnBounds.x, btnBounds.y};
 
     HideCursor();
     if(IsAudioDeviceReady())
@@ -83,29 +68,33 @@ int main()
         // with respect to scaling
         if (scrollingBack >= background.height) scrollingBack = 0;
 
+        backgroundPos1 = {0, scrollingBack};
+        backgroundPos2 = {0, -background.height + scrollingBack};
+
         //get cursor position and align in the middle of cursor to draw spaceship
         posx = GetMousePosition().x - 75;
         posy = GetMousePosition().y - 75;
 
         //get cursor position with respect to front of spaceship for game operations
         cockpitPos = {GetMousePosition().x - 75, GetMousePosition().y};
-        btnState = false;
         // Check button state
         if (CheckCollisionPointRec(cockpitPos, btnBounds))
         {
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) btnState = 2;
-            else btnState = 1;
-
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) btnAction = true;
+           if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+           {
+                btnState = true;
+           }
         }
-        else btnState = 0;
 
-        if (btnAction)
+        if (btnState)
         {
-            // TODO: scene transition to playing the game
+            //scene transition to playing the game
+            std::cout << "start playing!!!" << std::endl;
+            UnloadTexture(playButton);
+            btnState = false;
+            //todo: enemy spawn and so on
 
         }
-
         //mouse pressed
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -121,11 +110,10 @@ int main()
             
 
             //draw background
-            DrawTextureEx(background, (Vector2){0, scrollingBack}, 0.0f, 1.0f, WHITE);
-            DrawTextureEx(background, (Vector2){0, -background.height + scrollingBack}, 0.0f, 1.0f, WHITE);
+            DrawTextureEx(background, backgroundPos1, 0.0f, 2.0f, WHITE);
+            DrawTextureEx(background, backgroundPos2, 0.0f, 2.0f, WHITE);
             
-            //DrawTexture(playButton, 375, 460, WHITE);
-            DrawTextureRec(playButton, sourceRec, (Vector2){ btnBounds.x, btnBounds.y }, WHITE); // Draw button frame
+            DrawTextureEx(playButton, playButtonPos, 0.0f, 1.0f, WHITE);
 
             //draw spaceship as new cursor
             DrawTexture(spaceship, posx, posy, WHITE);
