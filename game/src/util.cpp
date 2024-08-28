@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-std::vector<Texture2D*>& loadAllTextures(const int allTexturesNum, const std::string type, std::vector<Texture2D*> &textures)
+std::vector<Texture2D>& loadAllTextures(const int allTexturesNum, const std::string type, std::vector<Texture2D> &textures)
 {
     /*
     file path is resources/Enemy or Bullet/enemy or bullet + number
@@ -21,9 +21,7 @@ std::vector<Texture2D*>& loadAllTextures(const int allTexturesNum, const std::st
         std::string filePath = firstDir + separator + type + separator + type + incChar + format;
         std::cout << filePath << std::endl; //testing
         cstr = filePath.c_str();
-        Texture2D* elem = new Texture2D;
-        *elem = LoadTexture(cstr);
-        textures.push_back(elem);
+        textures.push_back(LoadTexture(cstr));
     }    
 
     return textures;
