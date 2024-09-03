@@ -3,23 +3,24 @@
 
 #include "raylib.h"
 #include "Enemy.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <string>
 #include <Enemy.hpp>
 
-/*
-spawn enemy on screen, enemy spawn bullets, spawner also keep tracks of bullets -> data members vectors for enemies and bullets
-spawn limit -> check enemies spawned on screen <= fixed num
-
-*/
+extern const int screenWidth;
+extern const int screenHeight;
 
 class Spawner
 {
     public:
         //constructor
-        Spawner();
+        Spawner(std::vector<Texture2D> &textures);
+        Vector2 randomize(const int width, const int height); //spawn randomly at fixed part of screen, no overlap
 
-        Vector2 randomize(float restrictionX, float restrictionY); //spawn randomly at fixed part of screen
+        //draw existing assets on screen at each frame
+        void drawAll();
 
         //collision
         bool isCollision(Rectangle &first, Rectangle &second); //collision check either toward player by bullet or enemy, or toward enemy by player bullet

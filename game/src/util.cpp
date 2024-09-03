@@ -1,9 +1,6 @@
 #include "util.hpp"
-#include "raylib.h"
-#include <iostream>
-#include <string>
 
-std::vector<Texture2D>& loadAllTextures(const int allTexturesNum, const std::string type, std::vector<Texture2D> &textures)
+std::vector<Texture2D>& loadHostilesTextures(const int allTexturesNum, const std::string type, std::vector<Texture2D> &textures)
 {
     /*
     file path is resources/Enemy or Bullet/enemy or bullet + number
@@ -12,12 +9,11 @@ std::vector<Texture2D>& loadAllTextures(const int allTexturesNum, const std::str
     const std::string firstDir = "resources";
     const std::string separator = "/";
     const std::string format = ".png";
-    int incInt = 1;
 
     textures.clear();
     for(int i = 0; i < allTexturesNum; i++)
     {
-        char incChar = incInt + 48; //manually convert to char ascii
+        char incChar = i + 48 + 1; //manually convert to char ascii, +1 as assets start at 1
         std::string filePath = firstDir + separator + type + separator + type + incChar + format;
         std::cout << filePath << std::endl; //testing
         cstr = filePath.c_str();
@@ -27,11 +23,26 @@ std::vector<Texture2D>& loadAllTextures(const int allTexturesNum, const std::str
     return textures;
 }
 
-void unloadAllTextures(std::vector<Texture2D*> &textures)
+void unloadHostilesTextures(std::vector<Texture2D> &textures)
 {
     for(int i = 0; i < textures.size(); i++)
     {
-        UnloadTexture(*(textures.at(i)));
-        delete textures.at(i); // unsure about how unloadtexture work I might be double free
+        UnloadTexture((textures.at(i)));
     }
+}
+
+void startTimer(Timer& timer, float lifetime)
+{
+    timer.lifetime = lifetime;
+}
+
+void updateTimer(Timer& timer)
+{
+    
+    timer.lifetime -= GetFrameTime();
+}
+
+bool timerDone(Timer& timer)
+{
+    return timer.lifetime <= 0;
 }

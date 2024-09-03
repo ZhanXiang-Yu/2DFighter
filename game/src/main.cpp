@@ -1,6 +1,14 @@
 /*
 bugs:
-play button disappear to a smaller version of background -> fix scene transition issue
+*/
+
+/*
+TODO:
+add explosion animation
+change shooting sound
+add enemy obj return to origin movement pattern
+add ram toward player movement for enemy
+resizer for differnet screens 
 */
 
 #include "raylib.h"
@@ -9,20 +17,18 @@ play button disappear to a smaller version of background -> fix scene transition
 #include "util.hpp"
 #include "Enemy.hpp"
 #include "Spawner.hpp"
+#include <vector>
+#include <time.h>
 
-//transitions of diff. screens
-    enum screens
-    {
-        Start = 0,
-        Ingame,
-        End
-    };
+//window dimension global
+const int screenWidth = 1980;
+const int screenHeight = 1020;
 
 int main()
 {
-    //window size
-    const int screenWidth = 1980;
-    const int screenHeight = 1020;
+    srand(time(0));
+
+    //window init.
     InitWindow(screenWidth, screenHeight, "Fighter");
 
     //init audio
@@ -44,6 +50,17 @@ int main()
 
     SetTargetFPS(60);
 
+    //vector to hold all game assets and load
+    std::vector<Texture2D> texturesEnemies;
+    const std::string enemyDirID = "enemy";
+    const int enemyNum = 6;
+    std::vector<Texture2D> texturesBullets;
+    const std::string bulletDirID = "bullet";
+    const int bulletNum = 6;
+    //load all enemy assets
+    loadHostilesTextures(enemyNum, enemyDirID, texturesEnemies);
+    //load all bullet assets
+    loadHostilesTextures(bulletNum, bulletDirID, texturesBullets);
 
     //states of buttons
     bool playBtnState = false;
@@ -75,6 +92,9 @@ int main()
 
     //screen transition var
     screens currScreen = Start;
+
+    //testing
+    Spawner* test = new Spawner(texturesEnemies);
 
     HideCursor();
     while (!WindowShouldClose())
@@ -182,7 +202,7 @@ int main()
                     DrawTextureEx(playButton, playButtonPos, 0.0f, 1.0f, WHITE);
                     break;
                 case Ingame:
-
+                    test->drawAll();
                     break;
                 case End:
                     DrawTextureEx(gameOver, gameOverPos, 0.0f, 1.0f, WHITE);
@@ -202,7 +222,18 @@ int main()
     UnloadTexture(spaceship);
     UnloadImage(icon);
     UnloadTexture(playButton);
+    UnloadTexture(retryButton);
+    UnloadTexture(menuButton);
+    UnloadTexture(gameOver);
     UnloadSound(shootLaser);
+
+    //unload hostiles
+    unloadHostilesTextures(texturesEnemies);
+    unloadHostilesTextures(texturesBullets);
+
+    //testing
+    delete test;
+
     CloseAudioDevice();
     CloseWindow();
     return 0;
